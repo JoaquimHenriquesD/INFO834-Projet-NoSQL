@@ -16,7 +16,7 @@ def search_commune(name):
     :return: void
     """
     tic = time.perf_counter()
-    commune = communes.find_one({"nom_commune_complet" : name})
+    commune = communes.find_one({"nom_commune" : name})
     toc = time.perf_counter()
     print(commune)
     print(f"Document found in {toc - tic:0.4f} seconds")
