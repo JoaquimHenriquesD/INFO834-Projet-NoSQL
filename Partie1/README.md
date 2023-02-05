@@ -1,5 +1,7 @@
 # INFO834 – Mini-projet - Partie 1
+## *Auteurs : HENRIQUES DOS SANTOS Joaquim & WALLERAND Alex*
 
+Après avoir mis en place la base de données et importer les fichiers nous pouvons commencer les tests des premières commandes.
 ## 4 - Test des commandes de base
 
 - show databases
@@ -28,6 +30,34 @@ Test du curseur sur Studio 3T :
 ## 7 - Benchmark
 
 Nous avons créé un script qui permet de trouver un document de la collection *communes* en donnant en argument de la ligne de commande, le nom de la ville souhaité. La recherche se fait sur la colonne *nom_commune*, et nous affichons le temps que le script a mis pour trouver la donnée.
+
+```py
+from pymongo import MongoClient
+import time
+import sys
+
+# Connects to default host and port
+client = MongoClient()
+
+# Set the database France and collection communes
+db = client.France
+communes = db.communes
+
+def search_commune(name):
+    """
+    Print the searched commune, and the time it took to retrieve the data.
+    :param: (name) String
+    :return: void
+    """
+    tic = time.perf_counter()
+    commune = communes.find_one({"nom_commune" : name})
+    toc = time.perf_counter()
+    print(commune)
+    print(f"Document found in {toc - tic:0.4f} seconds")
+
+if __name__ == "__main__":
+    search_commune(sys.argv[1])
+```
 Résultat obtenu pour la commune Aranc :
 <p align="center"><img src="screens/benchmark.png"></p>
 Temps d'exécution : 0.0185 seconds.
@@ -85,7 +115,28 @@ db.users.find().forEach((user) => { db.lists.update({ _id: ObjectId("63dbda96761
 Elle récupère d'abord l'ensemble des utilisateurs de la collection *users*, puis pour chacun d'eux, elle les ajoute à la liste.
 
 Nous codons enfin un script Python qui récupère la list dans la collections *lists*, et qui prend son attribut *users*, et parcoure les id à l'intérieur de ce tableau. Puis on recherche l'id correspondant dans la collection *users*.
+
+```py
+from pymongo import MongoClient
+
+# Connects to default host and port
+client = MongoClient()
+
+# Set the database France and collection communes
+db = client.Mailing
+lists = db.lists
+
+mailing_list = lists.find_one()
+
+res = []
+for user in mailing_list["users"]:
+    res.append(db.users.find_one({"_id" : user}))
+print(res)
+
+```
 ## 12 - Ajout de user avec des droits
+
+Nous avons ajouté un utilisateur ayant seulement les droits de lecture, à l'aide de Studio 3T. Nous relançons le serveur avec l'option *--auth* pour obliger la connexion au serveur.
 
 ## 13 - Map Reduce
 
@@ -106,4 +157,12 @@ On obtient finalement les résultats suivants :
 
 ## 14 - Sauvegarde et restauration des données
 
+Nous effectuons avec succès les commandes données, afin de mettre en place une sauvegarde de la base de données.
+
 ## 15 - Aggrégation
+
+Nous commencons par créer une nouvelle BDD *zips*, dans laquelle nous créons une collection du même nom et nous importons le fichier à l'aide de Studio 3T.
+Nous calculons ensuite le premier aggrégat qui permet de calculer la somme des habitant de chaque état :
+<p align="center"><img src="screens/group.png"></p>
+
+Nous testons ainsi les autres commandes qui fonctionnent avec succès.
